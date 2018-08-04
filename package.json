@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fs": "0.0.1-security",
     "koa": "^2.5.1",
     "koa-router": "^7.4.0",
     "koa2-cors": "^2.0.5"
