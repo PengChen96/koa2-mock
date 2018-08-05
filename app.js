@@ -10,20 +10,6 @@ app.use(async (ctx, next) => {
   ctx.response.type = 'text/html';
   ctx.response.body = `<h1>Hello, world!</h1>`;
   console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
-  // 读取文件
-  await new Promise((resolve, reject) => {
-    fs.readFile(`${__dirname}/json/test.json`, 'utf8', (err, data) => {
-      if (err) {
-        resolve('error');
-      } else {
-        resolve(data.toString());
-      }
-    })
-  }).then((result) => {
-    const da = JSON.parse(JSON.stringify(result));
-    console.log(typeof da);
-    ctx.response.body = result.toString();
-  });
   await next();
 });
 
@@ -57,6 +43,28 @@ app.use(taxController.routes());
 app.listen(3000);
 console.log('app started at port 3000...');
 
+// 同步读取文件
 const result = fs.readFileSync(`${__dirname}/json/test.json`).toString();
-const b = JSON.parse(result);
-console.log(b.name);
+const resp = JSON.parse(result);
+console.log(resp.name);
+
+// 异步读取文件
+new Promise((resolve, reject) => {
+  fs.readFile(`${__dirname}/json/test.json`, 'utf8', (err, data) => {
+    if (err) {
+      resolve('error');
+    } else {
+      resolve(data.toString());
+    }
+  })
+}).then((result) => {
+  const resp = JSON.parse(result);
+  console.log(resp.name);
+  //
+  router.get('/file/info', async (ctx, next) => {
+    ctx.response.body = {
+      name: resp.name,
+      gender: '男'
+    };
+  });
+});
