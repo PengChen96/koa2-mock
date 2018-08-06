@@ -1,3 +1,6 @@
+/* global require */
+/* global __dirname */
+
 const Koa = require('koa');
 const app = new Koa();
 const router = require('koa-router')();
@@ -8,7 +11,7 @@ app.use(cors());
 // 对于任何请求，app将调用该异步函数处理请求：
 app.use(async (ctx, next) => {
   ctx.response.type = 'text/html';
-  ctx.response.body = `<h1>Hello, world!</h1>`;
+  ctx.response.body = '<h1>Hello, world!</h1>';
   console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
   await next();
 });
@@ -28,7 +31,7 @@ router.get('/read', async (ctx, next) => {
       } else {
         resolve(data.toString());
       }
-    })
+    });
   }).then((result) => {
     ctx.response.body = result;
   });
@@ -37,7 +40,7 @@ router.get('/read', async (ctx, next) => {
 
 app.use(router.routes());
 
-taxController = require('./controllers/tax');
+const taxController = require('./controllers/tax');
 app.use(taxController.routes());
 
 app.listen(3000);
@@ -52,11 +55,11 @@ console.log(resp.name);
 new Promise((resolve, reject) => {
   fs.readFile(`${__dirname}/json/test.json`, 'utf8', (err, data) => {
     if (err) {
-      resolve('error');
+      reject('error');
     } else {
       resolve(data.toString());
     }
-  })
+  });
 }).then((result) => {
   const resp = JSON.parse(result);
   console.log(resp.name);
@@ -67,4 +70,6 @@ new Promise((resolve, reject) => {
       gender: '男'
     };
   });
+}).catch((error) => {
+  console.log(error);
 });
