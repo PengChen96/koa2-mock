@@ -7,53 +7,50 @@ const router = require('koa-router')();
 const fs = require('fs');
 const cors = require('koa2-cors');
 app.use(cors());
+// views
+const indexView = require('./views/index.js');
 
 // 对于任何请求，app将调用该异步函数处理请求：
 app.use(async (ctx, next) => {
   ctx.response.type = 'text/html';
-  ctx.response.body = '<h1>Hello, world!</h1>';
+  ctx.response.body = indexView({name: '张三'});
   console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
   await next();
 });
 
-router.get('/person/info', async (ctx, next) => {
-  ctx.response.body = {
-    name: '张三',
-    gender: '男'
-  };
-});
-
-router.get('/read', async (ctx, next) => {
+router.post('/read', async (ctx, next) => {
   await new Promise((resolve, reject) => {
-    fs.readFile(`${__dirname}/json/test.json`, (err, data) => {
+    fs.readFile(`${__dirname}/json/index.json`, (err, data) => {
       if (err) {
-        resolve('error');
+        reject('error');
       } else {
         resolve(data.toString());
       }
     });
   }).then((result) => {
     ctx.response.body = result;
+  }).catch((error) => {
+    console.log(error);
   });
 });
 
 
 app.use(router.routes());
 
-const taxController = require('./controllers/tax');
-app.use(taxController.routes());
+const testController = require('./controllers/test');
+app.use(testController.routes());
 
 app.listen(3000);
 console.log('app started at port 3000...');
 
 // 同步读取文件
-const result = fs.readFileSync(`${__dirname}/json/test.json`).toString();
-const resp = JSON.parse(result);
-console.log(resp.name);
+// const result = fs.readFileSync(`${__dirname}/json/test.json`).toString();
+// const resp = JSON.parse(result);
+// console.log(resp.name);
 
 // 异步读取文件
 new Promise((resolve, reject) => {
-  fs.readFile(`${__dirname}/json/test.json`, 'utf8', (err, data) => {
+  fs.readFile(`${__dirname}/json/index.json`, 'utf8', (err, data) => {
     if (err) {
       reject('error');
     } else {
@@ -62,13 +59,11 @@ new Promise((resolve, reject) => {
   });
 }).then((result) => {
   const resp = JSON.parse(result);
-  console.log(resp.name);
-  //
-  router.get('/file/info', async (ctx, next) => {
-    ctx.response.body = {
-      name: resp.name,
-      gender: '男'
-    };
+  resp.forEach((item) => {
+    // router
+    router[item.method](item.URI, async (ctx, next) => {
+      ctx.response.body = item.response;
+    });
   });
 }).catch((error) => {
   console.log(error);

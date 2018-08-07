@@ -1,0 +1,41 @@
+[
+  {
+    "URI": "/api/get/index",
+    "method": "get",
+    "response": {
+      "head": {
+        "code": "00000000",
+        "description": "成功",
+        "msg": "成功",
+        "time": "2018-04-09 15:20:31",
+        "status": "Y"
+      },
+      "body": {
+        "companyId": 127155678,
+        "status": "3",
+        "msg": "数据有了吗1"
+      }
+    }
+  },
+  {
+    "URI": "/api/post/index",
+    "method": "post",
+    "response": {
+      "head": {
+        "code": "00000000",
+        "description": "成功",
+        "msg": "成功",
+        "time": "2018-04-09 15:20:31",
+        "status": "Y"
+      },
+      "body": {
+        "companyId": 127155678,
+        "status": "3",
+        "msg": "数据有了吗2",
+        "arr": [{
+          "name": ["1"]
+        }]
+      }
+    }
+  }
+]
