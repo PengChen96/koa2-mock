@@ -7,22 +7,17 @@ const router = require('koa-router')();
 const fs = require('fs');
 const cors = require('koa2-cors');
 app.use(cors());
-// views
-const indexView = require('./views/index.js');
 
 // 对于任何请求，app将调用该异步函数处理请求：
 app.use(async (ctx, next) => {
-  ctx.response.type = 'text/html';
-  ctx.response.body = indexView({name: '张三'});
   console.log(`Process ${ctx.request.method} ${ctx.request.url}`);
   await next();
 });
 
-
 app.use(router.routes());
 
-const testController = require('./controllers/test');
-app.use(testController.routes());
+const indexController = require('./controllers/indexController');
+app.use(indexController.routes());
 
 app.listen(3000);
 console.log('app started at port 3000...');
