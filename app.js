@@ -18,22 +18,6 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-router.post('/read', async (ctx, next) => {
-  await new Promise((resolve, reject) => {
-    fs.readFile(`${__dirname}/json/index.json`, (err, data) => {
-      if (err) {
-        reject('error');
-      } else {
-        resolve(data.toString());
-      }
-    });
-  }).then((result) => {
-    ctx.response.body = result;
-  }).catch((error) => {
-    console.log(error);
-  });
-});
-
 
 app.use(router.routes());
 
@@ -43,28 +27,51 @@ app.use(testController.routes());
 app.listen(3000);
 console.log('app started at port 3000...');
 
-// 同步读取文件
-// const result = fs.readFileSync(`${__dirname}/json/test.json`).toString();
-// const resp = JSON.parse(result);
-// console.log(resp.name);
 
-// 异步读取文件
+/************** 扫描文件添加Api **************/
+// 扫描json文件夹 读取文件夹下的文件名
 new Promise((resolve, reject) => {
-  fs.readFile(`${__dirname}/json/index.json`, 'utf8', (err, data) => {
+  fs.readdir(`${__dirname}/json/`, (err, data) => {
     if (err) {
-      reject('error');
+      reject(err);
     } else {
-      resolve(data.toString());
+      resolve(data);
     }
   });
 }).then((result) => {
-  const resp = JSON.parse(result);
-  resp.forEach((item) => {
-    // router
-    router[item.method](item.URI, async (ctx, next) => {
-      ctx.response.body = item.response;
-    });
+  console.log(`扫描到 ${result} 这${result.length}个文件`);
+  result.forEach((item) => {
+    // 异步读取文件内容
+    readFileInitRouter(item);
   });
 }).catch((error) => {
   console.log(error);
 });
+
+// 异步读取文件内容 初始化路由
+const readFileInitRouter = (fileName) => {
+  new Promise((resolve, reject) => {
+    fs.readFile(`${__dirname}/json/${fileName}`, 'utf8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.toString());
+      }
+    });
+  }).then((result) => {
+    const resp = JSON.parse(result);
+    console.log(`[${fileName}] 添加 ${resp.length} 个接口`);
+    resp.forEach((item) => {
+      // router
+      console.log(`[${fileName}] init router 【${item.URI}】`);
+      router[item.method](item.URI, async (ctx, next) => {
+        ctx.response.body = item.response;
+      });
+    });
+  }).catch((error) => {
+    console.log(error);
+  });
+};
+// 同步读取文件
+// const result = fs.readFileSync(`${__dirname}/json/test.json`).toString();
+// const resp = JSON.parse(result);
