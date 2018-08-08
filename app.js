@@ -4,7 +4,7 @@
 const Koa = require('koa');
 const app = new Koa();
 const router = require('koa-router')();
-const fs = require('fs');
+const cfs = require('./common/cfs');
 const cors = require('koa2-cors');
 app.use(cors());
 
@@ -25,35 +25,21 @@ console.log('app started at port 3000...');
 
 /************** 扫描文件添加Api **************/
 // 扫描json文件夹 读取文件夹下的文件名
-new Promise((resolve, reject) => {
-  fs.readdir(`${__dirname}/json/`, (err, data) => {
-    if (err) {
-      reject(err);
-    } else {
-      resolve(data);
-    }
-  });
-}).then((result) => {
+cfs.readdir(`${__dirname}/json/`).then((result) => {
   console.log(`扫描到 ${result} 这${result.length}个文件`);
   result.forEach((item) => {
     // 异步读取文件内容
     readFileInitRouter(item);
   });
+}).then(()=>{
+  console.log('1');
 }).catch((error) => {
   console.log(error);
 });
 
 // 异步读取文件内容 初始化路由
 const readFileInitRouter = (fileName) => {
-  new Promise((resolve, reject) => {
-    fs.readFile(`${__dirname}/json/${fileName}`, 'utf8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data.toString());
-      }
-    });
-  }).then((result) => {
+  cfs.readFile(`${__dirname}/json/${fileName}`).then((result) => {
     const resp = JSON.parse(result);
     console.log(`[${fileName}] 添加 ${resp.length} 个接口`);
     resp.forEach((item) => {
@@ -63,6 +49,8 @@ const readFileInitRouter = (fileName) => {
         ctx.response.body = item.response;
       });
     });
+  }).then(()=>{
+    console.log('2');
   }).catch((error) => {
     console.log(error);
   });
