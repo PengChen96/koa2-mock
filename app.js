@@ -31,8 +31,6 @@ cfs.readdir(`${__dirname}/json/`).then((result) => {
     // 异步读取文件内容
     readFileInitRouter(item);
   });
-}).then(()=>{
-  console.log('1');
 }).catch((error) => {
   console.log(error);
 });
@@ -49,8 +47,6 @@ const readFileInitRouter = (fileName) => {
         ctx.response.body = item.response;
       });
     });
-  }).then(()=>{
-    console.log('2');
   }).catch((error) => {
     console.log(error);
   });
