@@ -22,6 +22,28 @@ app.use(indexController.routes());
 app.listen(3000);
 console.log('app started at port 3000...');
 
+// 读取的全部json文件数据
+router.get('/data/all', async (ctx, next) => {
+  let promisy = [];
+  let fileArr = [];
+  await cfs.readdir(`${__dirname}/json/`).then((results) => {
+    fileArr = results;
+    results.forEach((fileName) => {
+      // 异步读取文件内容
+      promisy.push(cfs.readFile(`${__dirname}/json/${fileName}`));
+    });
+  });
+  await Promise.all(promisy).then((results) => {
+    let response = [];
+    results.forEach((item, index) => {
+      response.push({
+        fileName: fileArr[index],
+        fileData: JSON.parse(item)
+      });
+    });
+    ctx.response.body = response;
+  });
+});
 
 /************** 扫描文件添加Api **************/
 // 扫描json文件夹 读取文件夹下的文件名
