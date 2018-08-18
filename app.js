@@ -45,6 +45,10 @@ router.get('/data/all', async (ctx, next) => {
   });
 });
 
+cfs.cwatch('./json').then((result) => {
+  console.log('----------------------------------',result);
+})
+
 /************** 扫描文件添加Api **************/
 // 扫描json文件夹 读取文件夹下的文件名
 cfs.readdir(`${__dirname}/json/`).then((result) => {

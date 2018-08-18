@@ -3,6 +3,21 @@
 
 const fs = require('fs');
 
+let timer = null;
+const cwatch = (path) => {
+  return new Promise((resolve, reject) => {
+    fs.watch(path, {
+      persistent: true, // 设为false时，不会阻塞进程。
+      recursive: false
+    }, (event, filename) => {
+      if (event === 'change') {
+        console.log('+++++++++++++检测到变化');
+        resolve(filename);
+      }
+    });
+  });
+}
+
 // 读取path下【文件夹的名字和文件名】  返回 Array
 const readdir = (path) => {
   return new Promise((resolve, reject) => {
@@ -29,6 +44,7 @@ const readFile = (path) => {
 };
 
 module.exports = {
+  cwatch,
   readdir,
   readFile
 };
